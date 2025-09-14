@@ -52,7 +52,9 @@ end
 settings = load_settings()
 
 function get_models_async(callback)
+    print('[FFXI-AI-DEBUG] Entering get_models_async.')
     copas.addthread(function()
+        print('[FFXI-AI-DEBUG] get_models_async thread started.')
         local sock = socket.tcp()
         sock:settimeout(0)
         local ok, err = copas.connect(sock, '127.0.0.1', 11434)
@@ -111,15 +113,21 @@ function get_models_async(callback)
 end
 
 function get_default_model(callback)
+    print('[FFXI-AI-DEBUG] Entering get_default_model.')
     if settings.default_model then
+        print('[FFXI-AI-DEBUG] Found default model in settings.')
         callback(settings.default_model)
         return
     end
 
+    print('[FFXI-AI-DEBUG] No default model in settings, calling get_models_async.')
     get_models_async(function(models, err)
+        print('[FFXI-AI-DEBUG] get_models_async callback executing.')
         if err then
+            print('[FFXI-AI-DEBUG] get_models_async returned an error: ' .. err)
             callback(nil, err)
         else
+            print('[FFXI-AI-DEBUG] get_models_async returned models, using first one.')
             callback(models[1])
         end
     end)
@@ -128,7 +136,9 @@ end
 local active_request = nil
 
 function send_prompt(prompt, model, callback)
+    print('[FFXI-AI-DEBUG] Entering send_prompt.')
     if active_request then
+        print('[FFXI-AI-DEBUG] An active request is already in progress.')
         callback(nil, "An AI request is already in progress.")
         return
     end
@@ -301,8 +311,10 @@ ashita.events.register('command', 'command_cb', function (e)
 end)
 
 copas.addthread(function()
+    print('[FFXI-AI-DEBUG] Copas loop started.')
     while copas.status ~= 'done' do
         copas.step()
         copas.sleep(0.1)
     end
+    print('[FFXI-AI-DEBUG] Copas loop finished.')
 end)
