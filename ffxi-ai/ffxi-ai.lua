@@ -169,6 +169,7 @@ function send_prompt(prompt, model, callback)
 
         local data = { model = model, prompt = prompt, stream = false }
         local request_body = json.encode(data)
+
         local request_str = table.concat({
             "POST /api/generate HTTP/1.1\r\n",
             "Host: localhost:11434\r\n",
@@ -178,7 +179,7 @@ function send_prompt(prompt, model, callback)
             "\r\n",
             request_body
         })
-
+    
         ok, err = copas.send(sock, request_str)
         print("DEBUG: send_prompt send result:", ok, err)
         if not ok then
