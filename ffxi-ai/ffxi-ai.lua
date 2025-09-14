@@ -300,6 +300,9 @@ ashita.events.register('command', 'command_cb', function (e)
     end
 end)
 
-ashita.events.register('render', 'copas_loop_cb', function()
-    copas.step(0)
+copas.addthread(function()
+    while copas.status ~= 'done' do
+        copas.step()
+        copas.sleep(0.1)
+    end
 end)
