@@ -5,7 +5,6 @@ addon.desc      = 'Integrates with Ollama to bring AI to FFXI.'
 addon.link      = ''
 
 require('common')
-local chat = require('chat')
 local http = require('socket.http')
 local ltn12 = require('ltn12')
 local json = require('json')
@@ -67,7 +66,7 @@ ashita.events.register('command', 'command_cb', function (e)
     end
     local prompt = table.concat(prompt_args, ' ')
 
-    chat.add_to_log(123, 'Sending prompt to AI...')
+    print('Sending prompt to AI...')
     local response = send_prompt(prompt, model)
-    chat.add_to_log(123, '[AI] ' .. response)
+    print('[AI] ' .. response)
 end)
