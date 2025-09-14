@@ -35,7 +35,13 @@ function send_prompt(prompt, model)
 
     if res then
         local body = json.decode(table.concat(response_body))
-        return body.response
+        if body.response then
+            return body.response
+        elseif body.error then
+            return 'Ollama Error: ' .. body.error
+        else
+            return 'Unknown error from Ollama: response format is not recognized.'
+        end
     else
         return 'Error communicating with Ollama: ' .. tostring(code)
     end
