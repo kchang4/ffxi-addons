@@ -19,7 +19,7 @@ function send_prompt(prompt, model)
         prompt = prompt,
         stream = false
     }
-    local request_body = json.stringify(data)
+    local request_body = json.encode(data)
 
     local response_body = {}
     local res, code, headers, status = http.request{
@@ -34,7 +34,7 @@ function send_prompt(prompt, model)
     }
 
     if res then
-        local body = json.parse(table.concat(response_body))
+        local body = json.decode(table.concat(response_body))
         return body.response
     else
         return 'Error communicating with Ollama: ' .. tostring(code)
