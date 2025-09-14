@@ -5,7 +5,6 @@ addon.desc      = 'Integrates with Ollama to bring AI to FFXI.'
 addon.link      = ''
 
 require('common')
-local chat = require('chat')
 local http = require('socket.http')
 local ltn12 = require('ltn12')
 local json = require('json')
@@ -20,7 +19,7 @@ function send_prompt(prompt, model)
         prompt = prompt,
         stream = false
     }
-    local request_body = json.stringify(data)
+    local request_body = json.encode(data)
 
     local response_body = {}
     local res, code, headers, status = http.request{
@@ -35,8 +34,14 @@ function send_prompt(prompt, model)
     }
 
     if res then
-        local body = json.parse(table.concat(response_body))
-        return body.response
+        local body = json.decode(table.concat(response_body))
+        if body.response then
+            return body.response
+        elseif body.error then
+            return 'Ollama Error: ' .. body.error
+        else
+            return 'Unknown error from Ollama: response format is not recognized.'
+        end
     else
         return 'Error communicating with Ollama: ' .. tostring(code)
     end
@@ -67,7 +72,7 @@ ashita.events.register('command', 'command_cb', function (e)
     end
     local prompt = table.concat(prompt_args, ' ')
 
-    chat.add_to_log(123, 'Sending prompt to AI...')
+    print('Sending prompt to AI...')
     local response = send_prompt(prompt, model)
-    chat.add_to_log(123, '[AI] ' .. response)
+    print('[AI] ' .. response)
 end)
