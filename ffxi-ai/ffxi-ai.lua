@@ -9,6 +9,14 @@ local copas = require('copas')
 local socket = require('socket')
 local json = require('json')
 
+local g_CopasTask = nil;
+
+-- A task to process the copas socket handler. This will repeat indefinitely every 100ms.
+-- The initial delay is set to 0.1s to prevent blocking the addon load.
+g_CopasTask = ashita.tasks.repeating(0.1, -1, 0.1, function()
+    copas.step(0);
+end);
+
 local OLLAMA_URL_BASE = 'http://localhost:11434/api'
 local OLLAMA_URL_GENERATE = OLLAMA_URL_BASE .. '/generate'
 local OLLAMA_URL_TAGS = OLLAMA_URL_BASE .. '/tags'
@@ -300,6 +308,9 @@ ashita.events.register('command', 'command_cb', function (e)
     end
 end)
 
-ashita.events.register('render', 'copas_loop_cb', function()
-    copas.step(0)
-end)
+ashita.events.register('unload', 'ffxi_ai_unload_cb', function()
+    if g_CopasTask and g_CopasTask.cancel then
+        g_CopasTask:cancel();
+        g_CopasTask = nil;
+    end
+end);
