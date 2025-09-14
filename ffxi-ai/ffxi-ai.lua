@@ -9,6 +9,11 @@ local copas = require('copas')
 local socket = require('socket')
 local json = require('json')
 
+-- A task to process the copas socket handler. This will repeat indefinitely every 100ms.
+ashita.tasks.repeating(0, -1, 0.1, function()
+    copas.step(0);
+end);
+
 local OLLAMA_URL_BASE = 'http://localhost:11434/api'
 local OLLAMA_URL_GENERATE = OLLAMA_URL_BASE .. '/generate'
 local OLLAMA_URL_TAGS = OLLAMA_URL_BASE .. '/tags'
@@ -300,10 +305,3 @@ ashita.events.register('command', 'command_cb', function (e)
     end
 end)
 
-ashita.events.register('load', 'ffxi_ai_load_cb', function()
-    -- A task to process the copas socket handler.
-    -- This will repeat indefinitely every 100ms.
-    ashita.tasks.repeating(0, -1, 0.1, function()
-        copas.step(0);
-    end);
-end);
