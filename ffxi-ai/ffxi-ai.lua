@@ -310,11 +310,10 @@ ashita.events.register('command', 'command_cb', function (e)
     end
 end)
 
-copas.addthread(function()
-    print('[FFXI-AI-DEBUG] Copas loop started.')
-    while copas.status ~= 'done' do
-        copas.step()
-        copas.sleep(0.1)
-    end
-    print('[FFXI-AI-DEBUG] Copas loop finished.')
-end)
+ashita.events.register('load', 'ffxi_ai_load_cb', function()
+    -- A task to process the copas socket handler.
+    -- This will repeat indefinitely every 100ms.
+    ashita.tasks.repeating(0, -1, 0.1, function()
+        copas.step(0);
+    end);
+end);
